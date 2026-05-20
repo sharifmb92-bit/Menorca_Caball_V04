@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menorca Cavalls - Mercat Ecuestre</title>
+    <!-- Tailwind CSS para el diseño responsive y limpio -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Personalización del tema oscuro y barras de scroll ocultas */
+        body {
+            background-color: #111827; /* Gris muy oscuro */
+            color: #f3f4f6;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Forzar que las imágenes mantengan proporción hípica */
+        .img-container img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="flex justify-center min-h-screen antialiased">
+
+    <!-- Contenedor Principal (Optimizado para Móviles) -->
+    <div class="w-full max-w-md bg-[#1f2937] flex flex-col min-h-screen relative shadow-2xl pb-24 border-x border-gray-800">
+        
+        <!-- Cabecera de la App (Acento Verde Hípico Elegante) -->
+        <header class="bg-[#0f172a] border-b-2 border-[#10b981] p-4 text-center sticky top-0 z-50 shadow-md">
+            <h1 class="text-xl font-black tracking-widest text-[#10b981]">MENORCA CAVALLS</h1>
+            <p class="text-xs text-gray-400 font-semibold tracking-wider mt-0.5">MERCAT ECUESTRE LOCAL</p>
+        </header>
+
+        <!-- Contenido Dinámico de la Aplicación -->
+        <main class="flex-1 p-4 overflow-y-auto">
+            
+            <!-- ================= PESTAÑA: MERCADO (COMPRAR) ================= -->
+            <div id="view-buy" class="space-y-4">
+                <!-- Buscador visual -->
+                <div class="relative">
+                    <input type="text" id="search-input" oninput="filterProducts()" placeholder="Buscar en el mercado..." class="w-full bg-[#111827] border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-[#10b981] placeholder-gray-500">
+                    <i class="fas fa-search absolute right-4 top-3.5 text-gray-500"></i>
+                </div>
+
+                <!-- Filtros Inteligentes por Bloques / Categorías -->
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1">
+                    <button onclick="setActiveFilter('all', this)" class="filter-btn bg-[#10b981] text-white text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap shadow transition-all">Todo</button>
+                    <button onclick="setActiveFilter('PRM', this)" class="filter-btn bg-[#111827] border border-gray-700 text-gray-300 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all hover:border-gray-500">🐴 PRM</button>
+                    <button onclick="setActiveFilter('Carros', this)" class="filter-btn bg-[#111827] border border-gray-700 text-gray-300 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all hover:border-gray-500">🛞 Carros</button>
+                    <button onclick="setActiveFilter('Calzado', this)" class="filter-btn bg-[#111827] border border-gray-700 text-gray-300 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all hover:border-gray-500">🥾 Calzado</button>
+                    <button onclick="setActiveFilter('Guarnicionería', this)" class="filter-btn bg-[#111827] border border-gray-700 text-gray-300 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-all hover:border-gray-500">🏇 Guarnicionería</button>
+                </div>
+
+                <!-- Grid Inteligente de Productos -->
+                <div id="market-grid" class="grid grid-cols-2 gap-3">
+                    <!-- Los anuncios cargados desde localStorage se inyectarán aquí mediante JS -->
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: ANUNCIAR (VENDER) ================= -->
+            <div id="view-sell" class="hidden space-y-4">
+                <div class="bg-[#111827] p-4 rounded-2xl border border-gray-800">
+                    <h2 class="text-md font-bold text-gray-200 mb-3 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-[#10b981]"></i> Publicar Nuevo Artículo
+                    </h2>
+                    
+                    <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                        
+                        <!-- REINTEGRADO: Selector de Tipo de Artículo (Cuadros Grandes Interactivos) -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">¿Qué tipo de artículo vas a anunciar? *</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Cuadro Caballo -->
+                                <div id="tile-horse" onclick="setFormCategory('horse')" class="border-2 border-[#10b981] bg-[#10b981]/10 text-[#10b981] p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center">
+                                    <input type="radio" name="form_main_category" value="caballo" checked class="hidden">
+                                    <i class="fas fa-horse text-2xl mb-1"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wide">Caballo</span>
+                                </div>
+                                <!-- Cuadro Complemento -->
+                                <div id="tile-gear" onclick="setFormCategory('gear')" class="border-2 border-gray-700 bg-[#1f2937] text-gray-400 p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center hover:border-gray-500">
+                                    <input type="radio" name="form_main_category" value="complemento" class="hidden">
+                                    <i class="fas fa-toolbox text-2xl mb-1"></i>
+                                    <span class="text-xs font-bold uppercase tracking-wide">Complemento</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Título -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Título del anuncio *</label>
+                            <input type="text" id="form-title" required placeholder="Ej: Esclat - Noble menorquín apto..." class="w-full bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-[#10b981]">
+                        </div>
+
+                        <!-- Fila Precio e Inyección Automática de Categoría de Filtro -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Precio (€) *</label>
+                                <input type="number" id="form-price" required placeholder="Ej: 350" class="w-full bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-[#10b981]">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Bloque del Mercado *</label>
+                                <select id="form-market-tag" required class="w-full bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-[#10b981]">
+                                    <option value="PRM">🐴 PRM</option>
+                                    <option value="Carros">🛞 Carros</option>
+                                    <option value="Calzado">🥾 Calzado</option>
+                                    <option value="Guarnicionería">🏇 Guarnicionería</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Municipio de Menorca -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Municipio de Menorca *</label>
+                            <select id="form-location" required class="w-full bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-[#10b981]">
+                                <option value="">Selecciona lugar...</option>
+                                <option value="Alaior">Alaior</option>
+                                <option value="Ciutadella">Ciutadella</option>
+                                <option value="Es Castell">Es Castell</option>
+                                <option value="Es Mercadal">Es Mercadal</option>
+                                <option value="Es Migjorn Gran">Es Migjorn Gran</option>
+                                <option value="Ferreries">Ferreries</option>
+                                <option value="Maó">Maó</option>
+                                <option value="Sant Lluís">Sant Lluís</option>
+                            </select>
+                        </div>
+
+                        <!-- REINTEGRADO: Campos Dinámicos e Inteligentes según Selección -->
+                        <div class="bg-[#1f2937] border border-gray-800 p-3 rounded-xl space-y-3" id="dynamic-fields-box">
+                            <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest border-b border-gray-800 pb-1" id="dynamic-title">Especificaciones de Caballo</p>
+                            
+                            <!-- Sub-bloque de Caballo -->
+                            <div id="fields-horse-group" class="space-y-3">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-gray-400 mb-1">Raza del Caballo</label>
+                                    <select id="form-breed" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-[#10b981]">
+                                        <option>Pura Raza Menorquina (PRM)</option>
+                                        <option>Cruzado Menorquín</option>
+                                        <option>Otros</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center gap-2 pt-1">
+                                    <input type="checkbox" id="form-jaleos" class="w-4 h-4 rounded bg-[#111827] border-gray-700 text-[#10b981] focus:ring-0">
+                                    <label for="form-jaleos" class="text-xs font-bold text-gray-300">Apto para Fiestas / Jaleos</label>
+                                </div>
+                            </div>
+
+                            <!-- Sub-bloque de Complemento -->
+                            <div id="fields-gear-group" class="hidden">
+                                <div id="subcat-container">
+                                    <label class="block text-[11px] font-bold text-gray-400 mb-1">Subcategoría del Complemento *</label>
+                                    <select id="form-subcategory" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-[#10b981]">
+                                        <option value="Carros">Carros y Remolques</option>
+                                        <option value="Calzado">Zapatos y Botas</option>
+                                        <option value="Guarnicionería">Sillas y Guarnicionería</option>
+                                        <option value="Otros">Otros accesorios</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fotos y vídeos del producto -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fotos y vídeos del producto *</label>
+                            <input type="file" id="form-image" accept="image/*,video/*" required class="hidden" onchange="previewImage(event)">
+                            <div onclick="document.getElementById('form-image').click()" class="border-2 border-dashed border-gray-700 hover:border-[#10b981] bg-[#1f2937] p-5 rounded-lg text-center cursor-pointer transition-colors" id="upload-box">
+                                <i class="fas fa-camera text-2xl text-[#10b981] mb-1"></i>
+                                <p class="text-xs text-gray-400" id="upload-text">Toca para abrir cámara o seleccionar archivos</p>
+                            </div>
+                            <div id="image-preview-container" class="hidden mt-2 relative">
+                                <img id="image-preview" src="" class="w-full h-32 object-cover rounded-lg border border-gray-700">
+                                <button type="button" onclick="removePreviewImage()" class="absolute top-1.5 right-1.5 bg-red-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Tú teléfono -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tú teléfono (WhatsApp) *</label>
+                            <input type="tel" id="form-phone" required placeholder="Ej: 600123456" class="w-full bg-[#1f2937] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-[#10b981]">
+                        </div>
+
+                        <!-- Botón Enviar Anuncio (Azul Destacado) -->
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors shadow-lg uppercase tracking-wider mt-2">
+                            Publicar Anuncio
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ================= PESTAÑA: GESTIÓN (TABLA ESCANEABLE) ================= -->
+            <div id="view-admin" class="hidden space-y-4">
+                <div class="bg-[#111827] p-3 rounded-2xl border border-gray-800">
+                    <h2 class="text-md font-bold text-gray-200 mb-3 flex items-center gap-2">
+                        <i class="fas fa-tasks text-blue-500"></i> Panel de Control Interno
+                    </h2>
+                    
+                    <!-- Tabla Estructurada Escaneable Adaptada a Móviles -->
+                    <div class="overflow-x-auto rounded-xl border border-gray-800">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#1f2937] text-gray-400 uppercase font-black tracking-wider border-b border-gray-800">
+                                <tr>
+                                    <th class="p-2.5">Artículo</th>
+                                    <th class="p-2.5 text-center">Sección</th>
+                                    <th class="p-2.5 text-right">Precio</th>
+                                    <th class="p-2.5 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-gray-800">
+                                <!-- Filas dinámicas inyectadas por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ================= BARRA DE NAVEGACIÓN FIJA INFERIOR ================= -->
+        <nav class="absolute bottom-0 left-0 right-0 h-16 bg-[#0f172a] border-t border-gray-800 flex justify-around items-center z-50">
+            <button onclick="switchTab('buy', this)" class="nav-btn text-[#10b981] flex flex-col items-center justify-center w-1/3 h-full transition-colors">
+                <i class="fas fa-store text-lg mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-wide">Comprar</span>
+            </button>
+            <button onclick="switchTab('sell', this)" class="nav-btn text-gray-500 hover:text-gray-300 flex flex-col items-center justify-center w-1/3 h-full transition-colors">
+                <i class="fas fa-plus-circle text-lg mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-wide">+Vender / Subir</span>
+            </button>
+            <button onclick="switchTab('admin', this)" class="nav-btn text-gray-500 hover:text-gray-300 flex flex-col items-center justify-center w-1/3 h-full transition-colors">
+                <i class="fas fa-folder-open text-lg mb-0.5"></i>
+                <span class="text-[10px] font-bold tracking-wide">Gestión</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ================= SCRIPT DE LÓGICA INTEGRADA (JS) ================= -->
+    <script>
+        const defaultProducts = [
+            { id: 1, title: "Esclat - Apto Jaleos", price: "4500", category: "PRM", location: "Ciutadella", phone: "600000000", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400", type: "caballo", extra: "Raza: PRM - Apto Jaleos" },
+            { id: 2, title: "Carro paseo menorquín", price: "1500", category: "Carros", location: "Alaior", phone: "611000000", image: "https://images.unsplash.com/photo-1598974357801-ae6e44f806f4?w=400", type: "complemento", extra: "Subcategoría: Carros" }
+        ];
+
+        let currentFilter = 'all';
+        let base64ImageString = "";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('menorca_market_products')) {
+                localStorage.setItem('menorca_market_products', JSON.stringify(defaultProducts));
+            }
+            renderApp();
+        });
+
+        function switchTab(viewId, element) {
+            document.getElementById('view-buy').classList.add('hidden');
+            document.getElementById('view-sell').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-[#10b981]');
+                btn.classList.add('text-gray-500');
+            });
+            element.classList.remove('text-gray-500');
+            element.classList.add('text-[#10b981]');
+        }
+
+        // Lógica inteligente para alternar los cuadros de Caballo y Complemento
+        function setFormCategory(type) {
+            const tileHorse = document.getElementById('tile-horse');
+            const tileGear = document.getElementById('tile-gear');
+            const fieldsHorse = document.getElementById('fields-horse-group');
+            const fieldsGear = document.getElementById('fields-gear-group');
+            const dynamicTitle = document.getElementById('dynamic-title');
+            const marketTagSelect = document.getElementById('form-market-tag');
+
+            if (type === 'horse') {
+                tileHorse.className = "border-2 border-[#10b981] bg-[#10b981]/10 text-[#10b981] p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center";
+                tileGear.className = "border-2 border-gray-700 bg-[#1f2937] text-gray-400 p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center hover:border-gray-500";
+                
+                fieldsHorse.classList.remove('hidden');
+                fieldsGear.classList.add('hidden');
+                dynamicTitle.innerText = "Especificaciones de Caballo";
+                marketTagSelect.value = "PRM"; // Por defecto al bloque PRM
+                document.querySelector('input[value="caballo"]').checked = true;
+            } else {
+                tileGear.className = "border-2 border-blue-500 bg-blue-500/10 text-blue-400 p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center";
+                tileHorse.className = "border-2 border-gray-700 bg-[#1f2937] text-gray-400 p-4 rounded-xl text-center cursor-pointer transition-all flex flex-col items-center justify-center hover:border-gray-500";
+                
+                fieldsHorse.classList.add('hidden');
+                fieldsGear.classList.remove('hidden');
+                dynamicTitle.innerText = "Detalles del Complemento";
+                marketTagSelect.value = "Carros"; // Por defecto a Carros
+                document.querySelector('input[value="complemento"]').checked = true;
+            }
+        }
+
+        // Sincronizar el selector de subcategoría con la etiqueta del bloque del mercado automáticamente
+        document.getElementById('form-subcategory').addEventListener('change', function() {
+            document.getElementById('form-market-tag').value = this.value;
+        });
+
+        function setActiveFilter(category, buttonElement) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-[#10b981]', 'text-white', 'shadow');
+                btn.classList.add('bg-[#111827]', 'border', 'border-gray-700', 'text-gray-300');
+            });
+            buttonElement.classList.remove('bg-[#111827]', 'border', 'border-gray-700', 'text-gray-300');
+            buttonElement.classList.add('bg-[#10b981]', 'text-white', 'shadow');
+            
+            filterProducts();
+        }
+
+        function renderApp() {
+            const products = JSON.parse(localStorage.getItem('menorca_market_products')) || [];
+            const marketGrid = document.getElementById('market-grid');
+            const adminTableBody = document.getElementById('admin-table-body');
+            
+            marketGrid.innerHTML = "";
+            adminTableBody.innerHTML = "";
+
+            products.forEach(product => {
+                const isVisible = (currentFilter === 'all' || product.category === currentFilter);
+                if (isVisible) {
+                    const card = document.createElement('div');
+                    card.className = "product-card bg-[#111827] rounded-xl overflow-hidden border border-gray-800 shadow relative flex flex-col justify-between";
+                    
+                    // Comprobar si el producto tiene la etiqueta de "Apto Jaleos" para añadir el distintivo dorado menorquín
+                    const jaleoBadge = (product.extra && product.extra.includes("Apto Jaleos")) ? `<span class="absolute bottom-2 right-2 bg-yellow-600 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">🔥 JALEOS</span>` : '';
+
+                    card.innerHTML = `
+                        <div>
+                            <div class="img-container relative bg-gray-900">
+                                <img src="${product.image}" alt="Producto">
+                                <span class="absolute top-2 left-2 bg-[#1f2937]/95 text-[10px] font-black text-gray-200 px-2 py-0.5 rounded border border-gray-700">${product.category}</span>
+                                ${jaleoBadge}
+                            </div>
+                            <div class="p-2.5">
+                                <h3 class="text-xs font-bold text-gray-200 truncate">${product.title}</h3>
+                                <p class="text-[10px] text-gray-400 mt-0.5"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>${product.location}</p>
+                            </div>
+                        </div>
+                        <div class="p-2.5 pt-0 flex items-center justify-between gap-1.5">
+                            <span class="text-sm font-black text-[#10b981]">${parseFloat(product.price).toLocaleString('es-ES')} €</span>
+                            <div class="flex gap-1">
+                                <a href="https://wa.me/34${product.phone}?text=Hola,%20estoy%20interesado%20en%20el%20anuncio%20'${encodeURIComponent(product.title)}'%20que%20tienes%20en%20Menorca%20Cavalls." target="_blank" class="w-7 h-7 rounded-full bg-green-600 flex items-center justify-center text-white text-xs shadow hover:bg-green-700 transition-colors"><i class="fab fa-whatsapp"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://menorcacavalls.com" target="_blank" class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs shadow hover:bg-blue-700 transition-colors"><i class="fab fa-facebook-f"></i></a>
+                            </div>
+                        </div>
+                    `;
+                    marketGrid.appendChild(card);
+                }
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-[#1f2937]/50 transition-colors";
+                row.innerHTML = `
+                    <td class="p-2.5 font-bold text-gray-300 max-w-[120px] truncate">${product.title}</td>
+                    <td class="p-2.5 text-center"><span class="bg-[#111827] px-2 py-0.5 rounded text-gray-400 text-[10px] border border-gray-800">${product.category}</span></td>
+                    <td class="p-2.5 text-right font-black text-[#10b981]">${product.price} €</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="deleteProduct(${product.id})" class="bg-red-950 border border-red-800/60 text-red-400 w-7 h-7 rounded-lg hover:bg-red-900 flex items-center justify-center transition-colors"><i class="fas fa-trash-alt text-xs"></i></button>
+                    </td>
+                `;
+                adminTableBody.appendChild(row);
+            });
+        }
+
+        function filterProducts() {
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const products = JSON.parse(localStorage.getItem('menorca_market_products')) || [];
+            const marketGrid = document.getElementById('market-grid');
+            marketGrid.innerHTML = "";
+
+            products.forEach(product => {
+                const matchesTab = (currentFilter === 'all' || product.category === currentFilter);
+                const matchesSearch = product.title.toLowerCase().includes(searchVal) || product.location.toLowerCase().includes(searchVal);
+
+                if (matchesTab && matchesSearch) {
+                    const card = document.createElement('div');
+                    card.className = "product-card bg-[#111827] rounded-xl overflow-hidden border border-gray-800 shadow relative flex flex-col justify-between";
+                    const jaleoBadge = (product.extra && product.extra.includes("Apto Jaleos")) ? `<span class="absolute bottom-2 right-2 bg-yellow-600 text-black text-[9px] font-black px-1.5 py-0.5 rounded shadow">🔥 JALEOS</span>` : '';
+                    
+                    card.innerHTML = `
+                        <div>
+                            <div class="img-container relative bg-gray-900">
+                                <img src="${product.image}" alt="Producto">
+                                <span class="absolute top-2 left-2 bg-[#1f2937]/95 text-[10px] font-black text-gray-200 px-2 py-0.5 rounded border border-gray-700">${product.category}</span>
+                                ${jaleoBadge}
+                            </div>
+                            <div class="p-2.5">
+                                <h3 class="text-xs font-bold text-gray-200 truncate">${product.title}</h3>
+                                <p class="text-[10px] text-gray-400 mt-0.5"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>${product.location}</p>
+                            </div>
+                        </div>
+                        <div class="p-2.5 pt-0 flex items-center justify-between gap-1.5">
+                            <span class="text-sm font-black text-[#10b981]">${parseFloat(product.price).toLocaleString('es-ES')} €</span>
+                            <div class="flex gap-1">
+                                <a href="https://wa.me/34${product.phone}?text=Hola,%20interesado%20en%20'${encodeURIComponent(product.title)}'" target="_blank" class="w-7 h-7 rounded-full bg-green-600 flex items-center justify-center text-white text-xs shadow"><i class="fab fa-whatsapp"></i></a>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://menorcacavalls.com" target="_blank" class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs shadow"><i class="fab fa-facebook-f"></i></a>
+                            </div>
+                        </div>
+                    `;
+                    marketGrid.appendChild(card);
+                }
+            });
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64ImageString = e.target.result;
+                    document.getElementById('upload-box').classList.add('hidden');
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                    document.getElementById('image-preview').src = base64ImageString;
+                };
+                reader.readAsDataUrl ? reader.readAsDataURL(file) : reader.readAsDataURL(file);
+            }
+        }
+
+        function removePreviewImage() {
+            base64ImageString = "";
+            document.getElementById('form-image').value = "";
+            document.getElementById('upload-box').classList.remove('hidden');
+            document.getElementById('image-preview-container').classList.add('hidden');
+            document.getElementById('image-preview').src = "";
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('form-title').value;
+            const price = document.getElementById('form-price').value;
+            const marketTag = document.getElementById('form-market-tag').value;
+            const location = document.getElementById('form-location').value;
+            const phone = document.getElementById('form-phone').value;
+            
+            const isHorse = document.querySelector('input[name="form_main_category"]:checked').value === 'caballo';
+            
+            // Estructurar información adicional específica
+            let extraInfo = "";
+            if (isHorse) {
+                const breed = document.getElementById('form-breed').value;
+                const jaleos = document.getElementById('form-jaleos').checked ? " - Apto Jaleos" : "";
+                extraInfo = `Raza: ${breed}${jaleos}`;
+            } else {
+                const subcat = document.getElementById('form-subcategory').value;
+                extraInfo = `Subcategoría: ${subcat}`;
+            }
+
+            if (!base64ImageString) {
+                alert("Por favor, sube una foto real del producto desde tu cámara o galería.");
+                return;
+            }
+
+            const products = JSON.parse(localStorage.getItem('menorca_market_products')) || [];
+            
+            const newProduct = {
+                id: Date.now(),
+                title: title,
+                price: price,
+                category: marketTag,
+                location: location,
+                phone: phone,
+                image: base64ImageString,
+                type: isHorse ? 'caballo' : 'complemento',
+                extra: extraInfo
+            };
+
+            products.unshift(newProduct);
+            localStorage.setItem('menorca_market_products', JSON.stringify(products));
+
+            // Resetear todo de forma limpia
+            document.getElementById('uploadForm').reset();
+            removePreviewImage();
+            setFormCategory('horse'); // Volver al estado inicial de caballo
+            renderApp();
+            
+            // Volver inteligentemente a la pestaña Comprar (Mercado)
+            switchTab('buy', document.querySelectorAll('.nav-btn')[0]);
+        }
+
+        function deleteProduct(id) {
+            if (confirm("¿Estás seguro de que deseas retirar este artículo del mercado?")) {
+                let products = JSON.parse(localStorage.getItem('menorca_market_products')) || [];
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('menorca_market_products', JSON.stringify(products));
+                renderApp();
+            }
+        }
+    </script>
+</body>
+</html>
